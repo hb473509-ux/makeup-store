@@ -210,7 +210,7 @@
             margin-top: 4rem;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width:768px) {
             .container {
                 flex-direction: column;
                 gap: 1rem;
@@ -244,19 +244,17 @@
     </header>
 
     <section class="hero">
-        <div>
-            <h2>Discover Your Perfect Glow ✨</h2>
-            <p>Premium makeup products for every skin type</p>
-            <button class="cta-button">Shop Collection</button>
-        </div>
+        <h2>Discover Your Perfect Glow ✨</h2>
+        <p>Premium makeup products for every skin type</p>
+        <button class="cta-button">Shop Collection</button>
     </section>
 
     <section class="products" id="products">
-        <h2 style="text-align:center; margin-bottom: 3rem; color:#2c3e50; font-size:2.5rem;">Featured Products</h2>
+        <h2 style="text-align:center; margin-bottom:3rem; color:#2c3e50; font-size:2.5rem;">Featured Products</h2>
         <div class="products-grid">
             <div class="product-card">
                 <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1570194066981-687f4f6a071f?w=400" alt="Lipstick">
+                    <img src="https://images.unsplash.com/photo-1611585390100-d243a5b2f5c3?w=400" alt="Lipstick">
                 </div>
                 <div class="product-info">
                     <h3>Luminous Matte Lipstick</h3>
@@ -269,7 +267,7 @@
 
             <div class="product-card">
                 <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400" alt="Foundation">
+                    <img src="https://images.unsplash.com/photo-1600180758895-fd43936f5b7b?w=400" alt="Foundation">
                 </div>
                 <div class="product-info">
                     <h3>Velvet Foundation</h3>
@@ -306,12 +304,10 @@
     </section>
 
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 GlowBeauty. All rights reserved. 💄✨</p>
-        </div>
+        <p>&copy; 2024 GlowBeauty. All rights reserved. 💄✨</p>
     </footer>
 
-    <!-- CART POPUP -->
+    <!-- CART -->
     <div id="cartOverlay" class="cart-overlay" style="display:none;" onclick="closeCart()">
         <div class="cart" onclick="event.stopPropagation()">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
@@ -334,68 +330,37 @@
 
     <script>
         let cart = [];
-        let cartCount = 0;
-
         function addToCart(name, price) {
-            const existing = cart.find(item => item.name === name);
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                cart.push({ name, price, quantity: 1 });
-            }
-            updateCartDisplay();
+            const item = cart.find(i => i.name === name);
+            if (item) item.quantity += 1; else cart.push({ name, price, quantity: 1 });
+            updateCart();
         }
-
-        function updateCartDisplay() {
-            cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.querySelector('.cart-toggle').innerHTML = `🛒 Cart (${cartCount})`;
-            updateCartPopup();
-        }
-
-        function updateCartPopup() {
-            const cartItems = document.getElementById('cartItems');
-            const total = document.getElementById('cartTotal');
-
-            if (cart.length === 0) {
-                cartItems.innerHTML = '<p style="text-align:center; color:#7f8c8d;">Your cart is empty</p>';
-                total.textContent = '$0.00';
-                return;
-            }
-
-            cartItems.innerHTML = cart.map(item => `
+        function updateCart() {
+            const count = cart.reduce((s, i) => s + i.quantity, 0);
+            document.querySelector('.cart-toggle').innerHTML = `🛒 Cart (${count})`;
+            const itemsDiv = document.getElementById('cartItems');
+            const totalDiv = document.getElementById('cartTotal');
+            if (cart.length === 0) { itemsDiv.innerHTML = '<p style="text-align:center; color:#7f8c8d;">Your cart is empty</p>'; totalDiv.textContent = '$0.00'; return; }
+            itemsDiv.innerHTML = cart.map(i => `
                 <div class="cart-item">
-                    <strong>${item.name}</strong> 
+                    <strong>${i.name}</strong>
                     <div style="display:flex; align-items:center; gap:1rem; margin-top:0.5rem;">
-                        <span>$${item.price.toFixed(2)} x ${item.quantity}</span>
-                        <button onclick="changeQuantity('${item.name}', -1)" style="background:#eee; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">−</button>
-                        <span>${item.quantity}</span>
-                        <button onclick="changeQuantity('${item.name}', 1)" style="background:#eee; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">+</button>
+                        <span>$${i.price.toFixed(2)} x ${i.quantity}</span>
+                        <button onclick="changeQuantity('${i.name}',-1)" style="background:#eee;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;">−</button>
+                        <span>${i.quantity}</span>
+                        <button onclick="changeQuantity('${i.name}',1)" style="background:#eee;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;">+</button>
                     </div>
                 </div>
             `).join('');
-
-            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            total.textContent = `$${totalPrice.toFixed(2)}`;
+            const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+            totalDiv.textContent = `$${total.toFixed(2)}`;
         }
-
         function changeQuantity(name, change) {
-            const item = cart.find(item => item.name === name);
-            if (item) {
-                item.quantity += change;
-                if (item.quantity <= 0) {
-                    cart = cart.filter(i => i.name !== name);
-                }
-                updateCartDisplay();
-            }
+            const item = cart.find(i => i.name === name);
+            if (item) { item.quantity += change; if (item.quantity <= 0) cart = cart.filter(i => i.name !== name); updateCart(); }
         }
-
-        function toggleCart() {
-            document.getElementById('cartOverlay').style.display = 'flex';
-        }
-
-        function closeCart() {
-            document.getElementById('cartOverlay').style.display = 'none';
-        }
+        function toggleCart() { document.getElementById('cartOverlay').style.display = 'flex'; }
+        function closeCart() { document.getElementById('cartOverlay').style.display = 'none'; }
     </script>
 </body>
 
